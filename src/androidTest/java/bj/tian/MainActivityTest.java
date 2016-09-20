@@ -12,10 +12,10 @@ import android.test.ActivityInstrumentationTestCase2;
  * -e class bj.tian.MainTest \
  * bj.tian.tests/android.test.InstrumentationTestRunner
  */
-public class MainTest extends ActivityInstrumentationTestCase2<Main> {
+public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActivity> {
 
-    public MainTest() {
-        super("bj.tian", Main.class);
+    public MainActivityTest() {
+        super("bj.tian", MainActivity.class);
     }
 
 }

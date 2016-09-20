@@ -19,8 +19,8 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'me.tatarka.retrolambda'
 
 android {
-    compileSdkVersion 'android-23'
-    buildToolsVersion '23.0.2'
+    compileSdkVersion 23
+    buildToolsVersion '24.0.2'
 
     defaultConfig {
         minSdkVersion 15
