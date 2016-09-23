@@ -34,6 +34,7 @@ android {
     compileSdkVersion 24
     buildToolsVersion '24.0.2'
     defaultConfig {
+        applicationId 'xyz.imamber.amberbike'
         minSdkVersion 15
         targetSdkVersion 24
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"

@@ -1,4 +1,4 @@
-package xyz.imamber.amberrun
+package xyz.imamber.amberbike
 
 import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.action.ViewActions.click
