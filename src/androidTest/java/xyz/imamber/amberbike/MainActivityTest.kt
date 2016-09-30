@@ -10,6 +10,7 @@ import android.test.suitebuilder.annotation.LargeTest
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import xyz.imamber.amberbike.ui.MainActivity
 
 /**
  * Author: BaiJiFeiLong@gmail.com
