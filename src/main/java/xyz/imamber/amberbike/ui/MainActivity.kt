@@ -28,6 +28,11 @@ class MainActivity : BaseActivity() {
                     logger.info("{}", "Clicked me")
                 }
             }
+            button("Map") {
+                onClick {
+                    startActivity(intentFor<MapActivity>())
+                }
+            }
         }
     }
 

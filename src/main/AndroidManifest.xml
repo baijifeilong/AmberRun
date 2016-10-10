@@ -19,10 +19,6 @@
                  android:label="@string/app_name"
                  android:theme="@style/Theme.AppCompat.Light.NoActionBar"
                  tools:ignore="GoogleAppIndexingWarning">
-        <meta-data
-                android:name="com.baidu.lbsapi.API_KEY"
-                android:value="i9C5f53oGUXsWhLncG2pf1tIn6QYF4RG"/>
-
         <activity
                 android:name=".ui.MainActivity"
                 android:label="@string/app_name">
@@ -32,5 +28,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.TestActivity" android:exported="true"/>
+        <activity android:name=".ui.MapActivity"/>
     </application>
 </manifest>
