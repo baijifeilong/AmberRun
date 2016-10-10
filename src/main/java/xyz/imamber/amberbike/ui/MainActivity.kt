@@ -33,6 +33,21 @@ class MainActivity : BaseActivity() {
                     startActivity(intentFor<MapActivity>())
                 }
             }
+            button("Test") {
+                onClick {
+                    startActivity(intentFor<TestActivity>())
+                }
+            }
+            button("Snack") {
+                onClick {
+                    snack("I am snack")
+                }
+            }
+            button("Long Snack") {
+                onClick {
+                    longSnack("I am long snack")
+                }
+            }
         }
     }
 
