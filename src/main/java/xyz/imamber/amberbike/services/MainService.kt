@@ -42,15 +42,15 @@ class MainService : Service() {
         fun onLocationChanged(location: Location)
     }
 
-    private val callbacks = setOf<Callback>()
+    private val callbacks = mutableSetOf<Callback>()
 
     fun registerCallback(callback: Callback) {
-        callbacks + callback
+        callbacks.add(callback)
         logger.info("New callback registered: {}", callback)
     }
 
     fun unregisterCallback(callback: Callback) {
-        callbacks - callback
+        callbacks.remove(callback)
         logger.info("Callback unregistered: {}", callback)
     }
 

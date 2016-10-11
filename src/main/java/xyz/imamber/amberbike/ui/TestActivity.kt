@@ -49,6 +49,12 @@ class TestActivity : BaseActivity() {
                 }
             }
 
+            button("Map") {
+                onClick {
+                    startActivity(intentFor<MapActivity>())
+                }
+            }
+
             button("Create new book") {
                 onClick {
                     Book().apply {
@@ -123,6 +129,6 @@ class TestActivity : BaseActivity() {
     }
 
     private fun onLocationChanged(location: Location) {
-
+        logger.info("Test Activity received location update: {}", location)
     }
 }

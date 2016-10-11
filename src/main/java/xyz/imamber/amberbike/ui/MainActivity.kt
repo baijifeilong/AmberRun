@@ -6,9 +6,12 @@ import android.content.ServiceConnection
 import android.location.Location
 import android.os.Bundle
 import android.os.IBinder
+import android.view.Menu
+import android.view.MenuItem
 import org.jetbrains.anko.*
 import org.slf4j.LoggerFactory
 import xyz.imamber.amberbike.App
+import xyz.imamber.amberbike.R
 import xyz.imamber.amberbike.models.User
 import xyz.imamber.amberbike.services.MainService
 import javax.inject.Inject
@@ -45,38 +48,26 @@ class MainActivity : BaseActivity() {
 
         verticalLayout {
             padding = dip(30)
-            button("Mock location") {
-                onClick {
-                    toast("Clicked")
-                    logger.info("{}", "Clicked me")
-                }
-            }
-            button("Map") {
-                onClick {
-                    startActivity(intentFor<MapActivity>())
-                }
-            }
-            button("Test") {
-                onClick {
-                    startActivity(intentFor<TestActivity>())
-                }
-            }
-            button("Snack") {
-                onClick {
-                    snack("I am snack")
-                }
-            }
-            button("Long Snack") {
-                onClick {
-                    longSnack("I am long snack")
-                }
-            }
+
+            button("Nothing")
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         unbindService(mainServiceConnection)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.main, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.TEST -> startActivity(intentFor<TestActivity>())
+        }
+        return true
     }
 
     private fun onLocationChanged(location: Location) {
