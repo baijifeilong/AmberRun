@@ -9,6 +9,8 @@ import android.os.Bundle
 import android.os.IBinder
 import org.apache.commons.lang3.RandomUtils
 import org.jetbrains.anko.locationManager
+import org.slf4j.LoggerFactory
+import xyz.imamber.amberbike.App
 import java.util.*
 
 /**
@@ -16,13 +18,25 @@ import java.util.*
  * DateTime: 2016/10/10 16:15
  */
 class MainService : Service() {
+
+    var logger = LoggerFactory.getLogger(MainService::class.java)
+
+    var isListeningLocationUpdates = false
+        get
+        private set
+
+    var isMockingLocationUpdates = false
+        get
+        private set
+
     internal inner class Binder : android.os.Binder() {
         fun getService(): MainService {
             return this@MainService;
         }
     }
 
-    /// ========== Callback start
+    ////////////////////////////////////////////////////////////////////////////////
+    ////////// Callback start
 
     interface Callback {
         fun onLocationChanged(location: Location)
@@ -32,24 +46,29 @@ class MainService : Service() {
 
     fun registerCallback(callback: Callback) {
         callbacks + callback
+        logger.info("New callback registered: {}", callback)
     }
 
     fun unregisterCallback(callback: Callback) {
         callbacks - callback
+        logger.info("Callback unregistered: {}", callback)
     }
 
-    /// ========== Callback end
+    ////////// Callback end
+    ////////////////////////////////////////////////////////////////////////////////
 
     override fun onBind(intent: Intent?): IBinder? {
         return Binder()
     }
 
     override fun onCreate() {
-
+        App.onlyComponent(this).inject(this)
+        logger.info("Main Service created +++")
     }
 
     val locationListener = object : LocationListener {
         override fun onLocationChanged(location: Location) {
+            logger.info("Location changed from: " + location.provider)
             this@MainService.onLocationChanged(location)
         }
 
@@ -65,24 +84,30 @@ class MainService : Service() {
 
     fun startListenLocationUpdates() {
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000L, 5.0F, locationListener)
+        isListeningLocationUpdates = true
+        logger.info("Listening location updates OOO")
     }
 
     fun stopListenLocationUpdates() {
         locationManager.removeUpdates(locationListener)
+        isListeningLocationUpdates = false
+        logger.info("Stop listening location updates XXX")
     }
 
     fun onLocationChanged(location: Location) {
+        logger.info("Location Changed: {}", location)
         callbacks.forEach { callback ->
             callback.onLocationChanged(location)
         }
     }
 
-    /// Location mock start
+    ////////////////////////////////////////////////////////////////////////////////
+    ////////// Location mock start
 
-    val timer: Timer = Timer()
+    lateinit var timer: Timer
 
     fun startMockLocationUpdates() {
-        timer.cancel()
+        timer = Timer()
         timer.schedule(object : TimerTask() {
             override fun run() {
                 val location: Location = Location(LocationManager.GPS_PROVIDER).apply {
@@ -92,15 +117,21 @@ class MainService : Service() {
                 mockLocation(location)
             }
         }, 0, 5000)
+        isMockingLocationUpdates = true
+        logger.info("Mocking location updates OOO")
     }
 
     fun stopMockLocationUpdates() {
         timer.cancel()
+        isMockingLocationUpdates = false
+        logger.info("Stop mocking location updates XXX")
     }
 
     fun mockLocation(location: Location) {
+        logger.info("Location changed from MOCK")
         onLocationChanged(location)
     }
 
-    /// Location mock end
+    ////////// Location mock end
+    ////////////////////////////////////////////////////////////////////////////////
 }

@@ -29,5 +29,11 @@
         </activity>
         <activity android:name=".ui.TestActivity" android:exported="true"/>
         <activity android:name=".ui.MapActivity"/>
+
+        <!--////////////////////////////////////////////////////////////////////////////////-->
+        <!--////////// Services start-->
+        <service android:name=".services.MainService"/>
+        <!--////////// Services end-->
+        <!--////////////////////////////////////////////////////////////////////////////////-->
     </application>
 </manifest>
