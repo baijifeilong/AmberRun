@@ -20,6 +20,7 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import org.slf4j.LoggerFactory
 import xyz.imamber.amberbike.services.MainService
 import xyz.imamber.amberbike.ui.overlays.MyLocationOverlay
+import xyz.imamber.amberbike.ui.overlays.PathOverlay
 
 /**
  * Author: BaiJiFeiLong@gmail.com
@@ -32,6 +33,7 @@ class MapActivity : BaseActivity() {
     private lateinit var mainService: MainService
 
     private val myLocationOverlay by lazy { MyLocationOverlay() }
+    private val pathOverlay by lazy { PathOverlay() }
 
     private val ID_MAP_VIEW = 1
 

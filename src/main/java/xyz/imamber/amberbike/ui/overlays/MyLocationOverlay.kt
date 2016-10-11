@@ -16,7 +16,7 @@ import org.osmdroid.views.overlay.Overlay
 class MyLocationOverlay : Overlay() {
 
     var location: Location? = null
-    val point by lazy { Point() }
+    private val point by lazy { Point() }
 
     override fun draw(canvas: Canvas, mapView: MapView, shadow: Boolean) {
         if (location != null) {
