@@ -6,17 +6,11 @@ import android.content.ServiceConnection
 import android.location.Location
 import android.os.Bundle
 import android.os.IBinder
-import org.jetbrains.anko.find
 import org.jetbrains.anko.frameLayout
 import org.jetbrains.anko.intentFor
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.ScaleBarOverlay
-import org.osmdroid.views.overlay.compass.CompassOverlay
-import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider
-import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
-import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
-import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import org.slf4j.LoggerFactory
 import xyz.imamber.amberbike.services.MainService
 import xyz.imamber.amberbike.ui.overlays.MyLocationOverlay
@@ -32,10 +26,11 @@ class MapActivity : BaseActivity() {
 
     private lateinit var mainService: MainService
 
+    private lateinit var mapView: MapView
+
     private val myLocationOverlay by lazy { MyLocationOverlay() }
     private val pathOverlay by lazy { PathOverlay() }
 
-    private val ID_MAP_VIEW = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,28 +39,24 @@ class MapActivity : BaseActivity() {
         bindService(intentFor<MainService>(), mainServiceConnection, Context.BIND_AUTO_CREATE)
 
         frameLayout {
-            mapView {
-                id = ID_MAP_VIEW
+            this@MapActivity.mapView = mapView {
                 setBuiltInZoomControls(true)
                 setMultiTouchControls(true)
 
                 controller.apply {
-                    setZoom(11)
+                    setZoom(5)
                     setCenter(GeoPoint(32.0, 116.0))
                 }
 
-                overlays.apply {
-                    add(MyLocationNewOverlay(GpsMyLocationProvider(this@MapActivity), this@mapView))
-                    add(CompassOverlay(this@MapActivity, InternalCompassOrientationProvider(this@MapActivity), this@mapView))
-                    add(RotationGestureOverlay(this@mapView).apply {
-                        isEnabled = false
-                    })
-                    add(ScaleBarOverlay(this@mapView).apply {
-                        setCentred(true)
-                    })
-                    add(myLocationOverlay)
-                }
             }
+        }
+
+        mapView.overlays.apply {
+            add(ScaleBarOverlay(mapView).apply {
+                setCentred(true)
+            })
+            add(myLocationOverlay)
+            add(pathOverlay)
         }
     }
 
@@ -86,6 +77,14 @@ class MapActivity : BaseActivity() {
             logger.info("Main Service connected OOO")
             mainService = (service as MainService.Binder).getService()
             mainService.registerCallback(mainServiceCallback)
+
+            if (mainService.currentLocation != null) {
+                myLocationOverlay.setPoint(GeoPoint(mainService.currentLocation))
+            }
+            for (location in mainService.sportLocations) {
+                pathOverlay.addPoint(GeoPoint(location))
+            }
+            mapView.invalidate()
         }
     }
 
@@ -96,10 +95,13 @@ class MapActivity : BaseActivity() {
     }
 
     private fun onLocationChanged(location: Location) {
-        logger.info("MapActivity received location update: {}", location)
-        myLocationOverlay.location = location
+        logger.debug("MapActivity received location update: {}", location)
+        myLocationOverlay.setPoint(GeoPoint(location))
+        if (mainService.isInSport) {
+            pathOverlay.addPoint(GeoPoint(location))
+        }
         runOnUiThread {
-            find<MapView>(ID_MAP_VIEW).invalidate()
+            mapView.invalidate()
         }
     }
 }

@@ -1,13 +1,8 @@
 package xyz.imamber.amberbike.ui.overlays
 
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Point
-import android.location.Location
+import android.graphics.*
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
-import org.osmdroid.views.Projection
 import org.osmdroid.views.overlay.Overlay
 
 /**
@@ -16,32 +11,35 @@ import org.osmdroid.views.overlay.Overlay
  */
 class PathOverlay : Overlay() {
 
-    val locations by lazy { mutableListOf<Location>() }
-    val pointForReuse by lazy { Point() }
-    private val flatPoints by lazy { mutableListOf<Float>() }
-    private var projection: Projection? = null
+    private val point by lazy { Point() }
+    private val geoPoints by lazy { mutableListOf<GeoPoint>() }
+    private val path by lazy { Path() }
 
     private val paint by lazy {
         Paint().apply {
             color = Color.BLUE
-            strokeWidth = 5.toFloat()
+            strokeWidth = 3.toFloat()
+            style = Paint.Style.STROKE
             isAntiAlias = true
         }
     }
 
     override fun draw(canvas: Canvas, mapView: MapView, shadow: Boolean) {
-        if (projection == null) {
-            this.projection = mapView.projection
-        }
-        if (flatPoints.size >= 4) {
-            canvas.drawLines(flatPoints.toFloatArray(), paint)
+        if (geoPoints.size >= 2) {
+            path.reset()
+            for (i in geoPoints.indices) {
+                mapView.projection.toPixels(geoPoints[i], point)
+                if (i == 0) {
+                    path.moveTo(point.x.toFloat(), point.y.toFloat())
+                } else {
+                    path.lineTo(point.x.toFloat(), point.y.toFloat())
+                }
+            }
+            canvas.drawPath(path, paint)
         }
     }
 
-    fun addLocation(location: Location) {
-        locations.add(location)
-        projection!!.toPixels(GeoPoint(location), pointForReuse)
-        flatPoints.add(pointForReuse.x.toFloat())
-        flatPoints.add(pointForReuse.y.toFloat())
+    fun addPoint(geoPoint: GeoPoint) {
+        geoPoints.add(geoPoint)
     }
 }

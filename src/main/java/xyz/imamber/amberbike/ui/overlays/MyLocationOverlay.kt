@@ -4,7 +4,6 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Point
-import android.location.Location
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Overlay
@@ -15,17 +14,26 @@ import org.osmdroid.views.overlay.Overlay
  */
 class MyLocationOverlay : Overlay() {
 
-    var location: Location? = null
+    private var geoPoint: GeoPoint? = null
+
+    private val paint by lazy {
+        Paint().apply {
+            color = Color.RED
+            strokeWidth = 3.toFloat()
+            isAntiAlias = true
+        }
+    }
+
+    fun setPoint(geoPoint: GeoPoint) {
+        this.geoPoint = GeoPoint(geoPoint)
+    }
+
     private val point by lazy { Point() }
 
     override fun draw(canvas: Canvas, mapView: MapView, shadow: Boolean) {
-        if (location != null) {
-            mapView.projection.toPixels(GeoPoint(location), point)
-            canvas.drawPoint(point.x.toFloat(), point.y.toFloat(), Paint().apply {
-                color = Color.RED
-                strokeWidth = 50.toFloat()
-                isAntiAlias = true
-            })
+        if (geoPoint != null) {
+            mapView.projection.toPixels(geoPoint, point)
+            canvas.drawCircle(point.x.toFloat(), point.y.toFloat(), 10.toFloat(), paint)
         }
     }
 }

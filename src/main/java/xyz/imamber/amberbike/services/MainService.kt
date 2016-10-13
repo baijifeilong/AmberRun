@@ -29,6 +29,16 @@ class MainService : Service() {
         get
         private set
 
+    var isInSport = false
+        get
+        private set
+
+    var hasBeenPaused = false
+
+    var currentLocation: Location? = null
+
+    val sportLocations by lazy { mutableListOf<Location>() }
+
     internal inner class Binder : android.os.Binder() {
         fun getService(): MainService {
             return this@MainService;
@@ -96,9 +106,30 @@ class MainService : Service() {
 
     fun onLocationChanged(location: Location) {
         logger.info("Location Changed: {}", location)
+        this.currentLocation = location
+        if (isInSport) {
+            this.sportLocations.add(location)
+        }
         callbacks.forEach { callback ->
             callback.onLocationChanged(location)
         }
+    }
+
+    fun startSport() {
+        assert(isInSport == false)
+        sportLocations.clear()
+        isInSport = true
+    }
+
+    fun continueLastSport() {
+        assert(isInSport == false)
+        assert(sportLocations.isNotEmpty())
+        isInSport = true
+    }
+
+    fun stopSport() {
+        assert(isInSport == true)
+        isInSport = false
     }
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -106,7 +137,7 @@ class MainService : Service() {
 
     lateinit var timer: Timer
 
-    fun startMockLocationUpdates() {
+    fun startMockLocationUpdates(intervalInMillis: Long = 3000) {
         timer = Timer()
         timer.schedule(object : TimerTask() {
             override fun run() {
@@ -116,7 +147,7 @@ class MainService : Service() {
                 }
                 mockLocation(location)
             }
-        }, 0, 5000)
+        }, 0, intervalInMillis)
         isMockingLocationUpdates = true
         logger.info("Mocking location updates OOO")
     }

@@ -7,6 +7,7 @@ import android.location.Location
 import android.os.Bundle
 import android.os.IBinder
 import android.widget.Button
+import android.widget.TextView
 import com.activeandroid.query.Select
 import org.apache.commons.lang3.RandomStringUtils
 import org.apache.commons.lang3.RandomUtils
@@ -25,6 +26,8 @@ class TestActivity : BaseActivity() {
 
     private val ID_LISTEN_LOCATION_UPDATES = 1
     private val ID_MOCK_LOCATION_UPDATES = 2
+    private val ID_SPORT = 3
+    private val ID_SPORT_STATUS = 4
 
     @Inject
     lateinit var logger: Logger
@@ -86,10 +89,35 @@ class TestActivity : BaseActivity() {
             button() {
                 id = ID_MOCK_LOCATION_UPDATES
                 onClick {
-                    if (mainService.isMockingLocationUpdates)
-                        mainService.stopMockLocationUpdates() else mainService.startMockLocationUpdates()
+                    if (mainService.isMockingLocationUpdates) {
+                        mainService.stopMockLocationUpdates()
+                    } else {
+                        selector("Mock options", listOf("Very fast", "Fast", "Normal", "Slow", "Very slow")) { i ->
+                            when (i) {
+                                0 -> mainService.startMockLocationUpdates(300)
+                                1 -> mainService.startMockLocationUpdates(1000)
+                                2 -> mainService.startMockLocationUpdates(3000)
+                                3 -> mainService.startMockLocationUpdates(5000)
+                                4 -> mainService.startMockLocationUpdates(10000)
+                            }
+                        }
+                        mainService.startMockLocationUpdates()
+                    }
                     updateView()
                 }
+            }
+
+            button() {
+                id = ID_SPORT
+                onClick {
+                    if (mainService.isInSport)
+                        mainService.stopSport() else mainService.startSport()
+                    updateView()
+                }
+            }
+
+            textView() {
+                id = ID_SPORT_STATUS
             }
         }
     }
@@ -106,6 +134,17 @@ class TestActivity : BaseActivity() {
             "Stop listening location updates" else "Start listening location updates"
         find<Button>(ID_MOCK_LOCATION_UPDATES).text = if (mainService.isMockingLocationUpdates)
             "Stop mocking location updates" else "Start mocking location updates"
+        find<Button>(ID_SPORT).text = if (mainService.isInSport)
+            "Stop sport" else "Start sport"
+        find<TextView>(ID_SPORT_STATUS).text = if (mainService.isInSport) {
+            if (mainService.hasBeenPaused) {
+                "Paused"
+            } else {
+                "In Sport"
+            }
+        } else {
+            "Stopped"
+        }
     }
 
     private val mainServiceConnection = object : ServiceConnection {
